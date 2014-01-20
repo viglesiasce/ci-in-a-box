@@ -27,7 +27,6 @@ curl http://pkg.jenkins-ci.org/redhat/jenkins.repo > /etc/yum.repos.d/jenkins.re
 rpm --import http://pkg.jenkins-ci.org/redhat/jenkins-ci.org.key
 yum install -y jenkins git
 chkconfig jenkins on
-service jenkins start
 
 ### Configure NTP
 chkconfig ntpd on
@@ -42,6 +41,12 @@ iptables -F
 iptables -F -t nat
 iptables -A PREROUTING -t nat -i eth0 -p tcp --dport 80 -j REDIRECT --to-port 8080
 iptables-save > /etc/sysconfig/iptables
+
+### Put jenkins home in place and start it
+rm -rf /var/lib/jenkins
+git clone https://github.com/viglesiasce/ci-in-a-box.git /mnt/ci-in-a-box
+sed -i 's#/var/lib/jenkins#/mnt/ci-in-a-box/jenkins#g' /etc/sysconfig/jenkins
+service jenkins start
 
 --===============5423618256409275201==
 Content-Type: text/cloud-config; charset="us-ascii"
