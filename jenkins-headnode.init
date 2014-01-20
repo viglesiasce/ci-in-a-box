@@ -34,6 +34,9 @@ chkconfig ntpd on
 service ntpd start
 ntpdate -u pool.ntp.org
 
+### For building Java projects
+yum install -y ant ant-apache-regexp java-1.7.0-openjdk-devel.x86_64
+
 ### Setup IPtables
 iptables -F
 iptables -F -t nat
