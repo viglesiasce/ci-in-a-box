@@ -1,0 +1,58 @@
+Content-Type: multipart/mixed; boundary="===============5423618256409275201=="
+MIME-Version: 1.0
+
+--===============5423618256409275201==
+Content-Type: text/x-shellscript; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment; filename="script.sh"
+
+#!/bin/bash
+export EC2_URL=http://10.111.5.11:8773/services/Eucalyptus
+export EC2_ACCESS_KEY='AKIJ7RKJLLDRAGA4LVVT'
+export EC2_SECRET_KEY='JAeJ0u9mFVRyPWnMQjdZ4KKEctPVulcK2POB68Hd'
+instance_id=`curl http://169.254.169.254/latest/meta-data/instance-id`
+instance_ip=`curl http://169.254.169.254/latest/meta-data/local-ipv4`
+
+# enstratius agent
+export ENSTRATIUS_IP=10.111.5.195
+\/bin/rm -f install.sh
+/usr/bin/curl http://es-download.s3.amazonaws.com/install.sh > ./install.sh
+/bin/chmod +x ./install.sh
+./install.sh -c Eucalyptus -p ${ENSTRATIUS_IP}:3302
+/etc/init.d/tomcat-enstratus start
+
+### Install jenkins
+curl http://pkg.jenkins-ci.org/redhat/jenkins.repo > /etc/yum.repos.d/jenkins.repo
+rpm --import http://pkg.jenkins-ci.org/redhat/jenkins-ci.org.key
+yum install -y jenkins git
+chkconfig jenkins on
+service jenkins start
+
+### Configure NTP
+chkconfig ntpd on
+service ntpd start
+ntpdate -u pool.ntp.org
+
+### Setup IPtables
+iptables -F
+iptables -F -t nat
+iptables -A PREROUTING -t nat -i eth0 -p tcp --dport 80 -j REDIRECT --to-port 8080
+iptables-save > /etc/sysconfig/iptables
+
+--===============5423618256409275201==
+Content-Type: text/cloud-config; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment; filename="cloud-config.txt"
+
+#cloud-config
+disable_root: false
+apt_mirror: http://us.archive.ubuntu.com/ubuntu/
+byobu_by_default: system
+resize_rootfs: True
+mounts:
+- [ swap, null ]
+
+--===============5423618256409275201==--
+
