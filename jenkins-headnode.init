@@ -45,6 +45,7 @@ iptables-save > /etc/sysconfig/iptables
 ### Put jenkins home in place and start it
 rm -rf /var/lib/jenkins
 git clone https://github.com/viglesiasce/ci-in-a-box.git /mnt/ci-in-a-box
+chown -R jenkins:jenkins /mnt/ci-in-a-box/jenkins
 sed -i 's#/var/lib/jenkins#/mnt/ci-in-a-box/jenkins#g' /etc/sysconfig/jenkins
 service jenkins start
 
