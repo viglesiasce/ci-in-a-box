@@ -14,13 +14,13 @@ export EC2_SECRET_KEY='JAeJ0u9mFVRyPWnMQjdZ4KKEctPVulcK2POB68Hd'
 instance_id=`curl http://169.254.169.254/latest/meta-data/instance-id`
 instance_ip=`curl http://169.254.169.254/latest/meta-data/local-ipv4`
 
-# enstratius agent
-export ENSTRATIUS_IP=10.111.5.195
-\/bin/rm -f install.sh
-/usr/bin/curl http://es-download.s3.amazonaws.com/install.sh > ./install.sh
-/bin/chmod +x ./install.sh
-./install.sh -c Eucalyptus -p ${ENSTRATIUS_IP}:3302
-/etc/init.d/tomcat-enstratus start
+# enstratius agent disabled for testing
+#export ENSTRATIUS_IP=10.111.5.195
+#\/bin/rm -f install.sh
+#/usr/bin/curl http://es-download.s3.amazonaws.com/install.sh > ./install.sh
+#/bin/chmod +x ./install.sh
+#./install.sh -c Eucalyptus -p ${ENSTRATIUS_IP}:3302
+#/etc/init.d/tomcat-enstratus start
 
 ### Install jenkins
 curl http://pkg.jenkins-ci.org/redhat/jenkins.repo > /etc/yum.repos.d/jenkins.repo
@@ -47,6 +47,7 @@ rm -rf /var/lib/jenkins
 git clone https://github.com/viglesiasce/ci-in-a-box.git /mnt/ci-in-a-box
 chown -R jenkins:jenkins /mnt/ci-in-a-box/jenkins
 sed -i 's#/var/lib/jenkins#/mnt/ci-in-a-box/jenkins#g' /etc/sysconfig/jenkins
+usermod -d /mnt/ci-in-a-box/jenkins jenkins
 service jenkins start
 
 --===============5423618256409275201==
